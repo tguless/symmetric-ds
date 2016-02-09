@@ -939,11 +939,13 @@ public class DataService extends AbstractService implements IDataService {
             transaction
                     .prepareAndExecute(getSql("insertIntoDataEventSql"),
                             new Object[] {
-                                    dataId,
-                                    batchId,
-                                    StringUtils.isBlank(routerId) ? Constants.UNKNOWN_ROUTER_ID
-                                            : routerId }, new int[] { Types.NUMERIC, Types.NUMERIC,
-                                    Types.VARCHAR });
+	                                    dataId,
+	                                    batchId,
+	                                    StringUtils.isBlank(routerId) ? Constants.UNKNOWN_ROUTER_ID : routerId, 
+	                                    getCurrentTimeStamp() 
+                                    },
+                                    
+                                    new int[] { Types.NUMERIC, Types.NUMERIC, Types.VARCHAR, Types.TIMESTAMP });
         } catch (RuntimeException ex) {
             log.error("Could not insert a data event: data_id={} batch_id={} router_id={}",
                     new Object[] { dataId, batchId, routerId });
@@ -951,6 +953,7 @@ public class DataService extends AbstractService implements IDataService {
             throw ex;
         }
     }
+        
 
     public void insertDataEvents(ISqlTransaction transaction, final List<DataEvent> events) {
         if (events.size() > 0) {
@@ -962,14 +965,22 @@ public class DataService extends AbstractService implements IDataService {
                         new Object[] {
                                 dataEvent.getDataId(),
                                 dataEvent.getBatchId(),
-                                StringUtils.isBlank(routerId) ? Constants.UNKNOWN_ROUTER_ID
-                                        : routerId }, new int[] { Types.NUMERIC, Types.NUMERIC,
-                                Types.VARCHAR });
+                                StringUtils.isBlank(routerId) ? Constants.UNKNOWN_ROUTER_ID : routerId, 
+                                getCurrentTimeStamp()
+                                }, 
+                                new int[] { Types.NUMERIC, Types.NUMERIC, Types.VARCHAR, Types.TIMESTAMP });
             }
             transaction.flush();
         }
     }
 
+    private static java.sql.Timestamp getCurrentTimeStamp() {
+
+    	java.util.Date today = new java.util.Date();
+    	return new java.sql.Timestamp(today.getTime());
+
+    }
+    
     public void insertDataAndDataEventAndOutgoingBatch(Data data, String channelId,
             List<Node> nodes, String routerId, boolean isLoad, long loadId, String createBy) {
         ISqlTransaction transaction = null;

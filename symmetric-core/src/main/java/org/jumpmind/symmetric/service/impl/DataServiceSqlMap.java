@@ -77,7 +77,7 @@ public class DataServiceSqlMap extends AbstractSqlMap {
 
         putSql("insertIntoDataEventSql",
                 ""
-                        + "insert into $(data_event) (data_id, batch_id, router_id, create_time) values(?, ?, ?, current_timestamp)   ");
+                        + "insert into $(data_event) (data_id, batch_id, router_id, create_time) values(?, ?, ?, ?)   ");
 
         putSql("findDataEventCreateTimeSql", ""
                 + "select max(create_time) from $(data_event) where data_id=?   ");        
